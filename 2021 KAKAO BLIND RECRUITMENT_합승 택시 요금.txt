@@ -1,0 +1,42 @@
+// 2021 KAKAO BLIND RECRUITMENT : 합승 택시 요금 (플로이드 와샬 + 완전탐색)
+#include <string>
+#include <vector>
+
+using namespace std;
+
+int solution(int n, int s, int a, int b, vector<vector<int>> fares) {
+	// 노드의 개수 n, 출발 지점 s, A의 도착지점 a, B의 도착지점 b
+
+	int d[201][201]; // 긱 지점으로 가는 최소 비용 저장 (사용할 인덱스 : 1~200)
+	int INF = 20000000; // 임의의 큰값
+	for (int i = 1; i <= n; i++) {
+		for (int j = 1; j <= n; j++) {
+			if (i == j) d[i][j] = 0;
+			else d[i][j] = INF;
+		}
+	}
+
+	for (vector<int> fare : fares) {
+		d[fare[0]][fare[1]] = fare[2];
+		d[fare[1]][fare[0]] = fare[2];
+	}
+
+	// 각 지점까지 가는 최소 비용 갱신 (플로이드 와샬)
+	for (int k = 1; k <= n; k++) { 
+		for (int i = 1; i <= n; i++) {
+			for (int j = 1; j <= n; j++) { 
+				if (d[i][k] + d[k][j] < d[i][j]) {
+					d[i][j] = d[i][k] + d[k][j];
+				}
+			}
+		}
+	}
+
+	// 각 지점을 거쳐서 A, B로 가는 비용을 구함
+	int ans = INF;
+	for (int i = 1; i <= n; i++) { // 지나치는 지점
+		ans = min(ans, d[s][i] + d[i][a] + d[i][b]);
+	}
+
+	return ans;
+}
