@@ -1,0 +1,41 @@
+// 2019 카카오 개발자 겨울 인턴십 : 크레인 인형뽑기 게임
+#include <string>
+#include <vector>
+#include <stack>
+
+using namespace std;
+
+int h[30]; // 각 칸의 인형의 높이를 저장
+
+int solution(vector<vector<int>> board, vector<int> moves) {
+    int answer = 0;
+
+    // 각 칸의 인형의 높이를 구함
+    for (int i = 0; i < board.size(); i++) {
+        for (int j = 0; j < board[i].size(); j++) {
+            if (board[i][j] != 0) h[j]++;
+        }
+    }
+
+    stack<int> basket; // 바구니를 stack으로 구현 
+
+    for (int i = 0; i < moves.size(); i++) {
+        int move_idx = moves[i] - 1;
+        int h_idx = board.size() - h[move_idx];
+
+        if (h[move_idx] <= 0) continue; // 해당 위치에 인형이 없다면
+
+        int toy = board[h_idx][move_idx];
+        h[move_idx]--;
+
+        if (!basket.empty() && basket.top() == toy) { // 인형을 터트린다.
+            basket.pop();
+            answer += 2;
+        }
+        else {
+            basket.push(toy); // 인형을 바구니에 넣는다.
+        }
+    }
+
+    return answer;
+}
