@@ -1,0 +1,32 @@
+// 2018 KAKAO BLIND RECRUITMENT : 비밀지도
+#include <string>
+#include <vector>
+#include <bitset>
+
+using namespace std;
+
+vector<string> solution(int n, vector<int> arr1, vector<int> arr2) {
+    vector<string> answer;
+
+    for (int i = 0; i < n; i++) {
+        string result = "";
+
+        // arr1의 한 행을 2진수로 변환
+        bitset<16> bs1(arr1[i]);
+        string row1 = bs1.to_string();
+
+        // arr2의 한 행을 2진수로 변환
+        bitset<16> bs2(arr2[i]);
+        string row2 = bs2.to_string();
+
+        // 두 지도를 비교 (전체 지도의 한 행을 구함)
+        for (int j = 16 - n; j < 16; j++) {
+            if (row1[j] == '1' || row2[j] == '1') result += "#";
+            else result += " ";
+        }
+
+        answer.push_back(result);
+    }
+
+    return answer;
+}
