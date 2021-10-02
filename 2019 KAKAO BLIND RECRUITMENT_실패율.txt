@@ -1,0 +1,48 @@
+// 2019 KAKAO BLIND RECRUITMENT : 실패율
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <iostream>
+
+using namespace std;
+
+int total;
+int notClear[501]; // 사용할 인덱스 : 1~500
+vector<pair<int, double>> result;
+
+bool cmp(pair<int, double> x, pair<int, double> y) {
+    if (x.second == y.second) {
+        return x.first < y.first;
+    }
+    return x.second > y.second;
+}
+
+vector<int> solution(int N, vector<int> stages) {
+    vector<int> answer;
+
+    total = stages.size(); // 전체 게임 사용자의 수 
+
+    for (int stage : stages) {
+        notClear[stage]++;
+    }
+
+    for (int i = 1; i <= N; i++) {
+        if (total == 0) {
+            result.push_back({ i, 0 });
+            continue;
+        }
+
+        double failureRate = (double)notClear[i] / total; // 실패율
+        total -= notClear[i];
+
+        result.push_back({ i, failureRate });
+    }
+
+    sort(result.begin(), result.end(), cmp); // second가 큰 순, first가 작은 순
+
+    // 답안
+    for (auto res : result) {
+        answer.push_back(res.first);
+    }
+    return answer;
+}
