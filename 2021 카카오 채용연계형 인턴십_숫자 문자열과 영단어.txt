@@ -1,0 +1,43 @@
+// 2021 카카오 채용연계형 인턴십 : 숫자 문자열과 영단어
+#include <string>
+#include <vector>
+#include <unordered_map>
+
+using namespace std;
+
+int solution(string s) {
+    int answer;
+
+    unordered_map<string, char> digit;
+    digit["zero"] = '0';
+    digit["one"] = '1';
+    digit["two"] = '2';
+    digit["three"] = '3';
+    digit["four"] = '4';
+    digit["five"] = '5';
+    digit["six"] = '6';
+    digit["seven"] ='7';
+    digit["eight"] = '8';
+    digit["nine"] = '9';
+
+    int idx = 0;
+    string str_num;
+    while (idx < s.size()) {
+        if ('0' <= s[idx] && s[idx] <= '9') {
+            str_num += s[idx];
+            idx++; // 다음 탐색할 지점
+        }
+        else {
+            string word;
+            while (digit.find(word) == digit.end()) {
+                word += s[idx];
+                idx++; // 다음 탐색할 지점
+            }
+            str_num += digit[word];
+        }
+    }
+
+    answer = stoi(str_num); // str_num to int
+
+    return answer;
+}
