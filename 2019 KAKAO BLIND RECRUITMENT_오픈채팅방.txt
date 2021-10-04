@@ -1,0 +1,43 @@
+// 2019 KAKAO BLIND RECRUITMENT : 오픈채팅방 (문자열 + 해시)
+#include <string>
+#include <vector>
+#include <unordered_map>
+
+using namespace std;
+
+vector<string> solution(vector<string> record) {
+    vector<string> answer;
+
+    unordered_map<string, string> hash; // {id(kay), nickname(value)};
+    vector<pair<string, string>> result; // {id, command}
+    for (string rec : record) {
+        string command; // 명령어
+        command += rec[0];
+
+        string id;
+        if (command == "E" || command == "C") { // Enter or Change
+            int id_idx = rec.find(" ");
+            int nickname_idx = rec.find(" ", id_idx + 1);
+            id = rec.substr(id_idx + 1, nickname_idx - id_idx - 1);
+            string nickname = rec.substr(nickname_idx + 1);
+
+            hash[id] = nickname;
+        }
+        else { // Leave
+            int id_idx = rec.find(" ");
+            id = rec.substr(id_idx + 1);
+        }
+
+        if (command == "E" || command == "L") result.push_back({ id, command });
+    }
+
+    for (auto res : result) {
+        string msg = hash[res.first];
+        if (res.second == "E") msg += "님이 들어왔습니다."; // Enter
+        else msg += "님이 나갔습니다."; // Leave
+
+        answer.push_back(msg);
+    }
+
+    return answer;
+}
