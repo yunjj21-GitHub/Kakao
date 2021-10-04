@@ -1,0 +1,79 @@
+// 2018 KAKAO BLIND RECRUITMENT : 프렌즈4블록 (구현 + 백트래킹)
+#include <string>
+#include <vector>
+
+using namespace std;
+
+char map[30][30];
+pair<int, int> d[3] = { {0, 1}, {1, 0}, {1, 1} }; // {y, x}
+
+void pop_block(int m, int n, vector<pair<int, int>> block) {
+    // 블록을 없애고
+    for (int i = 0; i < block.size(); i++) {
+        map[block[i].first][block[i].second] = '0';
+    }
+
+    // 빈 공간을 채운다.
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (map[i][j] != '0') continue;
+
+            for (int k = i; k - 1 >= 0; k--) { // !!중요!!
+                map[k][j] = map[k - 1][j];
+                map[k - 1][j] = '0';
+            }
+        }
+    }
+}
+
+int solution(int m, int n, vector<string> board) {
+    int answer = 0;
+
+    for (int i = 0; i < m; i++) { // 높이 m
+        for (int j = 0; j < n; j++) { // 폭 n
+            map[i][j] = board[i][j];
+        }
+    }
+
+    while (1) {
+        vector<pair<int, int>> block; // 사라질 블록의 좌표를 저장
+
+        // 사라질 수 있는 블록 탐색
+        for (int y = 0; y < m; y++) {
+            for (int x = 0; x < n; x++) {
+
+                if (map[y][x] == '0') continue;
+                
+                int i;
+                for (i = 0; i < 3; i++) {
+                    int nxtY = y + d[i].first;
+                    int nxtX = x + d[i].second;
+
+                    if (0 > nxtY || nxtY >= m || 0 > nxtX || nxtX >= n) break;
+
+                    if (map[y][x] != map[nxtY][nxtX]) break;
+                }
+
+                if (i == 3) {
+                    block.push_back({ y, x });
+                    for (int k = 0; k < 3; k++) {
+                        block.push_back({ y + d[k].first, x + d[k].second });
+                    }
+                }
+            }
+        }
+
+        if (block.size() == 0) break;
+
+        // map갱신
+        pop_block(m, n, block);
+    }
+
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (map[i][j] == '0') answer++;
+        }
+    }
+
+    return answer;
+}
