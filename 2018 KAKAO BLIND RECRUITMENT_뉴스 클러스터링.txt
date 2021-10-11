@@ -1,0 +1,61 @@
+// 2018 KAKAO BLIND RECRUITMENT : 뉴스 클러스터링
+#include <string>
+#include <unordered_map>
+
+using namespace std;
+
+int solution(string str1, string str2) {
+    unordered_map<string, int> str1_hash;
+    unordered_map<string, int> str2_hash;
+
+    // 입력된 문자열의 소문자를 대문자로 변경
+    for (int i = 0; i < str1.size(); i++) {
+        if ('a' <= str1[i] && str1[i] <= 'z') str1[i] -= 32;
+    }
+    for (int i = 0; i < str2.size(); i++) {
+        if ('a' <= str2[i] && str2[i] <= 'z') str2[i] -= 32;
+    }
+
+    // 두 문자씩 잘라준다.
+    int tot = 0; // 합집합 원소의 개수를 저장
+    for (int i = 0; i < str1.size() - 1; i++) {
+        if ('A' > str1[i] || str1[i] > 'Z' || 'A' > str1[i + 1] || str1[i + 1] > 'Z') continue;
+        string tmp;
+        tmp += str1[i];
+        tmp += str1[i + 1];
+
+        str1_hash[tmp]++;
+
+        tot++;
+    }
+    for (int i = 0; i < str2.size() - 1; i++) {
+        if ('A' > str2[i] || str2[i] > 'Z' || 'A' > str2[i + 1] || str2[i + 1] > 'Z') continue;
+        string tmp;
+        tmp += str2[i];
+        tmp += str2[i + 1];
+
+        str2_hash[tmp]++;
+
+        tot++;
+    }
+
+    // 자카드 유사도를 구한다.
+    int inter = 0; // 교집합 원소의 개수를 저장
+    for (auto str1_ele : str1_hash) {
+        if (str2_hash.find(str1_ele.first) == str2_hash.end()) continue; // 없다면
+
+        // 있다면
+        inter += min(str1_ele.second, str2_hash[str1_ele.first]);
+        tot -= (str1_ele.second + str2_hash[str1_ele.first] - max(str1_ele.second, str2_hash[str1_ele.first]));
+    }
+    double Jaccard;
+    if (tot == 0) {
+        Jaccard = 65536;
+    }
+    else {
+        Jaccard = ((double)inter / tot) * 65536;
+    }
+    
+    int answer = Jaccard;
+    return answer;
+}
