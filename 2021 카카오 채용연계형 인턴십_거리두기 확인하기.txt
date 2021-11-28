@@ -1,0 +1,65 @@
+// 2021 카카오 채용연계형 인턴십 : 거리두기 확인하기
+#include <string>
+#include <vector>
+
+using namespace std;
+
+// 맨해튼 거리가 1일 때
+int dx_1[2] = { 1, 0 };
+int dy_1[2] = { 0, 1 };
+
+// 맨해튼 거리가 2일 때
+int dx_2[6][2] = { {-1, -1}, {0, -1}, {1, 1}, {0, 1}, {0, 0}, {1, 2} };
+int dy_2[6][2] = { {0, 1}, {1, 1}, {0, 1}, {1, 1}, {1, 2}, {0, 0} };
+
+vector<int> solution(vector<vector<string>> places) {
+    vector<int> answer;
+
+    int T = 0; // 대기실 번호
+    while (T<5) {
+        bool result = 1;
+        
+        for (int y = 0; y < 5; y++) { // 대기실 열
+            for (int x = 0; x < 5; x++) { // 대기실 행
+                if (!result) break;
+
+                if (places[T][y][x] != 'P') continue;
+
+                // 맨해튼 거리 1이 지켜지지 않았는지 확인
+                for (int i = 0; i < 2; i++) {
+                    int nxtX = x + dx_1[i];
+                    int nxtY = y + dy_1[i];
+
+                    if (0 > nxtX || nxtX >= 5 || 0 > nxtY || nxtY >= 5) continue;
+                    if (places[T][nxtY][nxtX] != 'P') continue;
+
+                    result = 0;
+                    break;
+                }
+
+                // 맨해튼 거리 2가 지켜지지 않았는지 확인
+                for (int i = 0; i < 6; i++) {
+                    int nxtX = x + dx_2[i][0];
+                    int nxtY = y + dy_2[i][0];
+
+                    if (0 > nxtX || nxtX >= 5 || 0 > nxtY || nxtY >= 5) continue;
+                    if (places[T][nxtY][nxtX] != 'O') continue;
+
+                    nxtX = x + dx_2[i][1];
+                    nxtY = y + dy_2[i][1];
+
+                    if (0 > nxtX || nxtX >= 5 || 0 > nxtY || nxtY >= 5) continue;
+                    if (places[T][nxtY][nxtX] != 'P') continue;
+
+                    result = 0;
+                    break;
+                }
+            }
+        }
+
+        answer.push_back(result);
+        T++;
+    }
+
+    return answer;
+}
