@@ -1,0 +1,83 @@
+// 2018 KAKAO BLIND RECRUITMENT : 파일명 정리 (구현 + 정렬)
+#include <string>
+#include <vector>
+
+using namespace std;
+
+vector<string> solution(vector<string> files) {
+    vector<string> answer;
+
+    // 버블 정렬 알고리즘
+    for (int i = 0; i < files.size() - 1; i++) {
+        for (int j = 1; j < files.size() - i; j++) {
+            // 두 요소를 비교하는 부분을 재정의
+
+            // HEAD 비교
+            string head1;
+            int idx_1;
+            for (idx_1 = 0; idx_1 < files[j - 1].size(); idx_1++) {
+                if (files[j - 1][idx_1] >= '0' && files[j - 1][idx_1] <= '9') break;
+
+                // 대소문자 구별X (대문자 → 소문자)
+                if (files[j - 1][idx_1] >= 'A' && files[j - 1][idx_1] <= 'Z') {
+                    head1 += (files[j - 1][idx_1] + 32);
+                }
+                else {
+                    head1 += files[j - 1][idx_1];
+                }
+            }
+
+            string head2;
+            int idx_2;
+            for (idx_2 = 0; idx_2 < files[j].size(); idx_2++) {
+                if (files[j][idx_2] >= '0' && files[j][idx_2] <= '9') break;
+
+                // 대소문자 구별X (대문자 → 소문자)
+                if (files[j][idx_2] >= 'A' && files[j][idx_2] <= 'Z') {
+                    head2 += (files[j][idx_2] + 32);
+                }
+                else {
+                    head2 += files[j][idx_2];
+                }
+            }
+
+            if (head1 < head2) continue;
+
+            if (head1 > head2) {
+                // swap
+                string tmp = files[j - 1];
+                files[j - 1] = files[j];
+                files[j] = tmp;
+
+                continue;
+            }
+
+            // NUMBER 비교
+            string num1;
+            for (idx_1; idx_1 < files[j - 1].size(); idx_1++) {
+                if (files[j - 1][idx_1] < '0' || files[j - 1][idx_1] > '9') break;
+
+                num1 += files[j - 1][idx_1];
+            }
+
+            string num2;
+            for (idx_2; idx_2 < files[j].size(); idx_2++) {
+                if (files[j][idx_2] < '0' || files[j][idx_2] > '9') break;
+
+                num2 += files[j][idx_2];
+            }
+
+            if (stoi(num1) > stoi(num2)) {
+                // swap
+                string tmp = files[j - 1];
+                files[j - 1] = files[j];
+                files[j] = tmp;
+
+                continue;
+            }
+        }
+    }
+
+    answer = files;
+    return answer;
+}
