@@ -1,0 +1,42 @@
+// 2018 KAKAO BLIND RECRUITMENT : n진수 게임
+#include <string>
+#include <vector>
+
+using namespace std;
+
+string result;
+
+// 10진수를 n진수로 변환하는 함수
+void converting(int num, int n) {
+    if (num == 0) return;
+
+    converting(num / n, n);
+
+    if (num % n >= 10) {
+        result += (char)('A' + num % n - 10);
+    }
+    else {
+        result += to_string(num% n);
+    }
+}
+
+string solution(int n, int t, int m, int p) {
+    string answer = "";
+
+    string game = "0"; // 게임이 진행될 때 사용될 숫자 열
+    int num = 1;
+    while (game.size() <= t*m) {
+        result = "";
+        converting(num, n);
+        game += result;
+
+        num++;
+    }
+
+    // 튜브가 말하게 될 숫자 열
+    for (int i = p - 1; i < t * m; i += m) {
+        answer += game[i];
+    }
+
+    return answer;
+}
