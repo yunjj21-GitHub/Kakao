@@ -1,0 +1,81 @@
+// 2018 KAKAO BLIND RECRUITMENT : 방금그곡 (문자열 + 구현)
+#include <string>
+#include <vector>
+
+using namespace std;
+
+string solution(string m, vector<string> musicinfos) {
+    string answer = "";
+
+    // 네오가 기억한 멜로디의 #음 처리
+    string remembered;
+    for (int i = 0; i < m.size(); i++) {
+        if (m[i + 1] == '#') {
+            remembered += tolower(m[i]);
+            i++;
+        }
+        else {
+            remembered += m[i];
+        }
+    }
+
+    int maxPlayTime = 0;
+    for (string music : musicinfos) {
+        // 해당 음악이 재생된 시간을 구한다.
+        string start_h = music.substr(0, 2);
+
+        string end_h = music.substr(6, 2);
+
+        string start_m = music.substr(3, 2);
+
+        string end_m = music.substr(9, 2);
+
+        // 해당 음악이 재생된 시간 (분 단위로 저장)
+        if (end_h == "00" && end_m == "00") end_h = "24";
+        int playTime = (stoi(end_h) * 60 + stoi(end_m)) - (stoi(start_h) * 60 + stoi(start_m));
+
+        // 음악 제목과 원본 음악을 구한다.
+        int i;
+        string title; // 음악 제목
+        for (i = 12; music[i] != ','; i++) {
+            title += music[i];
+        }
+
+        i++;
+        string origin_melody; // 원본 음악
+        for (i; i < music.size(); i++) {
+            // #음 처리
+            if (music[i + 1] == '#') {
+                origin_melody += tolower(music[i]);
+                i++;
+            }
+            else {
+                origin_melody += music[i];
+            }
+        }
+
+        // 실제 재생된 멜로디를 구한다.
+        string played_melody;
+        while (played_melody.size() <= playTime) {
+            played_melody += origin_melody;
+        }
+        played_melody = played_melody.substr(0, playTime);
+
+        // 네오가 기억한 멜로디가 실제 재생된 멜로디에 포함되지 않는다면
+        if (played_melody.find(remembered) == string::npos) continue;
+
+        // 재생된 시간이 이전에 조건을 만족한 음악의 재생된 시간보다 적다면
+        if (playTime <= maxPlayTime) continue;
+
+        // 답안 갱신
+        answer = title;
+        maxPlayTime = playTime;
+    }
+
+    // 조건이 일치하는 음악이 없다면
+    if (answer == "") {
+        answer = "(None)";
+    }
+
+    return answer;
+}
