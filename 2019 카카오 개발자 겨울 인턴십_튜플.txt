@@ -1,0 +1,62 @@
+// 2019 카카오 개발자 겨울 인턴십 : 튜플
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <unordered_map>
+
+#include <iostream>
+
+using namespace std;
+
+bool cmp(vector<int> x, vector<int> y) {
+    return x.size() < y.size();
+}
+
+vector<int> solution(string s) {
+    vector<int> answer;
+
+    // 문자열로 주어진 집합 정보를 벡터형식으로 바꾼다.
+    vector<vector<int>> combinations; // 큰 집합
+    vector<int> comb; // 작은 집합
+    string element=""; // 작은 집합의 하나의 요소
+    int idx = 2;
+    while (idx < s.size()) {
+        if (s[idx] == ',') {
+            comb.push_back(stoi(element));
+            element = "";
+
+            idx += 1;
+            continue;
+        }
+        else if (s[idx] == '}') {
+            comb.push_back(stoi(element));
+            element = "";
+
+            combinations.push_back(comb);
+            comb.clear();
+
+            idx += 3;
+            continue;
+        }
+
+        element += s[idx];
+        idx++;
+    }
+
+    // 집합의 크기가 작은순으로 벡터 정렬
+    sort(combinations.begin(), combinations.end(), cmp);
+
+    // 답안을 구한다.
+    unordered_map<int, int> hash; // 중복되는 원소인지 검색용
+    for (int i = 0; i < combinations.size(); i++) {
+        for (int j = 0; j < combinations[i].size(); j++) {
+            // 중복되는 원소라면
+            if (hash.find(combinations[i][j]) != hash.end()) continue;
+
+            hash[combinations[i][j]]++;
+            answer.push_back(combinations[i][j]);
+        }
+    }
+
+    return answer;
+}
