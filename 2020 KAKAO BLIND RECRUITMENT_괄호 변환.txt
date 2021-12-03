@@ -1,0 +1,73 @@
+// 2020 KAKAO BLIND RECRUITMENT : 괄호 변환 (재귀 + 문자열)
+#include <string>
+#include <vector>
+#include <stack>
+
+using namespace std;
+
+// 올바른 괄호 문자열인지 판별하는 함수
+bool isCorrect(string s) {
+    stack<char> stack;
+
+    bool result = true;
+    for (int i = 0; i < s.size(); i++) {
+        if (s[i] == ')') {
+            if (stack.size() >= 1) stack.pop();
+            else { // 올바른 괄호 문자열이 아님
+                result = false;
+                break;
+            }
+        }
+        else {
+            stack.push('(');
+        }
+    }
+
+    return result;
+}
+
+string transformParentheses(string p) {
+    string result = "";
+
+    if (p == "") return result;
+
+    // 두 균형잡힌 괄호 문자열로 분리한다. (이때, u는 최대한 작게 분리한다.)
+    int left = 0;
+    int right = 0;
+    string u = "";
+    string v = "";
+    int i = 0;
+    for (i; i < p.size(); i++) {
+        if (p[i] == '(') left++;
+        else right++;
+
+        u += p[i];
+
+        if (left == right) break;
+    }
+    v = p.substr(i + 1);
+
+    if (isCorrect(u)) { // u가 올바른 괄호 문자열 이라면
+        result += u;
+
+        result += transformParentheses(v);
+    }
+    else { // u가 올바른 괄호 문자열이 아니라면
+        string tmp = "(";
+        tmp += transformParentheses(v);
+        tmp += ")";
+        for (int i = 1; i < u.size() - 1; i++) {
+            if (u[i] == '(') tmp += ')';
+            else tmp += '(';
+        }
+        result += tmp;
+    }
+
+    return result;
+}
+
+string solution(string p) {
+    string answer = transformParentheses(p);
+
+    return answer;
+}
