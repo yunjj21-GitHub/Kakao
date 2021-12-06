@@ -1,0 +1,46 @@
+// 2018 KAKAO BLIND RECRUITMENT : 압축(해시 + 문자열)
+#include <string>
+#include <vector>
+#include <unordered_map>
+
+using namespace std;
+
+vector<int> solution(string msg) {
+    vector<int> answer;
+
+    unordered_map<string, int> dictionary;
+    int idx = 1;
+
+    // 사전 초기화
+    string word = "@";
+    for (idx; idx <= 26; idx++) {
+        word[0]++;
+        dictionary[word] = idx;
+    }
+
+    string target;
+    for (int i = 0; i < msg.size(); i++) {
+        target += msg[i];
+
+        // 사전 내에 있는 단어라면
+        if (dictionary.find(target) != dictionary.end()) {
+            if (i == msg.size() - 1) answer.push_back(dictionary[target]);
+
+            continue;
+        }
+
+        // 사전 내에 없는 단어라면
+        string w = target.substr(0, i);
+        string wc = target;
+        answer.push_back(dictionary[w]);
+
+        dictionary[wc] = idx;
+        idx++;
+
+        msg = msg.substr(i); // msg 갱신
+        i = -1;
+        target = "";
+    }
+
+    return answer;
+}
