@@ -1,0 +1,47 @@
+// 2017 카카오코드 본선 : 단체사진 찍기
+#include <string>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+// 전역 변수를 정의할 경우 함수 내에 초기화 코드를 꼭 작성해주세요.
+int solution(int n, vector<string> data) {
+    int answer = 0;
+
+    // 카카오 프렌즈에 해당하는 문자를 저장
+    vector<char> friends = { 'A', 'C', 'F', 'J', 'M', 'N', 'R', 'T' };
+
+    // 위의 벡터로 순열을 만듦
+    do {
+        string position = ""; // 사진찍을 캐릭터의 위치를 저장
+        for (int i = 0; i < friends.size(); i++) {
+            position += friends[i];
+        }
+
+        // 조건 검사
+        int i;
+        for (i = 0; i < n; i++) {
+            int pos1 = position.find(data[i][0]);
+            int pos2 = position.find(data[i][2]);
+            char sign = data[i][3];
+            int value = data[i][4] - 48; // 아스키값 처리
+
+            if (sign == '='){
+                if (abs(pos1 - pos2) - 1 != value) break;
+            }
+            else if (sign == '>') {
+                if (abs(pos1 - pos2) - 1 <= value) break;
+            }
+            else { // sign == '<'
+                if (abs(pos1 - pos2) - 1 >= value) break;
+            }
+        }
+
+        // 모든 조건을 만족했다면
+        if (i == n) answer++;
+
+    } while (next_permutation(friends.begin(), friends.end()));
+
+    return answer;
+}
