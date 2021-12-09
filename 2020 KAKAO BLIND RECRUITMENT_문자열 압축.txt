@@ -1,0 +1,62 @@
+// 2020 KAKAO BLIND RECRUITMENT : 문자열 압축
+#include <string>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+int solution(string s) {
+    int answer = 0;
+
+    int minLenght = s.size(); // 최소 문자열의 길이
+
+    for (int len = 1; len <= s.size(); len++) {
+
+        queue<string> q; // 잘린 문자열들을 저장
+
+        // len 길이로 문자열을 자른다.
+        int startIdx = 0;
+        while (startIdx + len < s.size()) {
+            q.push(s.substr(startIdx, len));
+            startIdx += len;
+        }
+        // 남는 문자열 처리
+        if (startIdx < s.size()) q.push(s.substr(startIdx));
+
+        // 문지열을 압축한다.
+        int result = len;
+
+        int cnt = 1; // 반복되는 문자열의 개수를 저장
+
+        string preStr = q.front();
+        q.pop();
+
+        while (!q.empty()) {
+            string targetStr = q.front();
+            q.pop();
+
+            if (preStr == targetStr) { // 현재 문자열이 이전 문자열과 동일하다면
+                cnt++;
+
+                if (q.empty()) result += to_string(cnt).size();
+            }
+            else { // 현재 문자열이 이전 문자열과 다르다면
+                if (cnt != 1) {
+                    string cntStr = to_string(cnt);
+                    result += cntStr.size();
+                    cnt = 1;
+                }
+
+                result += targetStr.size();
+                preStr = targetStr;
+            }
+        }
+
+        // 가장 짧은 문자열의 길이 갱신
+        if (result < minLenght) minLenght = result;
+    }
+
+    // 답안 갱신
+    answer = minLenght;
+    return answer;
+}
