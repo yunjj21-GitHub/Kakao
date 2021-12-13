@@ -1,0 +1,60 @@
+// 2019 카카오 개발자 겨울 인턴십 : 불량 사용자 (문자열 + map)
+#include <string>
+#include <vector>
+#include <map>
+
+using namespace std;
+
+vector<vector<string>> badUserId; // 불량 사용자가 될 수 있는 id를 저장
+map<string, int> m; // 집합을 구할때 사용
+map<string, int> result; // 가능한 불량 사용자 목록을 저장
+
+void selectId(int cnt) {
+    if (cnt == badUserId.size()) { // 선택된 id의 개수와 찾아야 하는 id의 개수가 동일하다면
+        string list;
+        for (auto element : m) {
+            list += (element.first + " ");
+        }
+
+        if (result.find(list) == result.end()) result[list]++;
+
+        return;
+    }
+
+    for (int i = 0; i < badUserId[cnt].size(); i++) {
+        if (m.find(badUserId[cnt][i]) != m.end()) continue;
+
+        m[badUserId[cnt][i]]++;
+        selectId(cnt + 1);
+        m.erase(badUserId[cnt][i]);
+    }
+}
+
+int solution(vector<string> user_id, vector<string> banned_id) {
+    int answer = 0;
+
+    // 불량 사용자가 될 수 있는 id를 찾는다.
+    for (string bannedId : banned_id) {
+        vector<string> tmp;
+        for (string userId : user_id) {
+            if (userId.size() != bannedId.size()) continue;
+
+            int i;
+            for (i = 0; i < bannedId.size(); i++) {
+                if (bannedId[i] != '*' && bannedId[i] != userId[i]) break;
+            }
+
+            if (i == bannedId.size()) tmp.push_back(userId);
+        }
+
+        badUserId.push_back(tmp);
+    }
+
+    // 가능한 불량 사용자 id의 목록을 구한다. (완전탐색)
+    selectId(0);
+
+    // 답안 갱신
+    answer = result.size();
+
+    return answer;
+}
