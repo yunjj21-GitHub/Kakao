@@ -1,0 +1,49 @@
+// 2019 카카오 개발자 겨울 인턴십 : 징검다리 건너기 (이분탐색)
+#include <string>
+#include <vector>
+
+#include <iostream>
+
+using namespace std;
+
+int solution(vector<int> stones, int k) {
+    int answer = 0;
+
+    // stone의 최댓값과 최솟값을 구한다.
+    int max = 1;
+    int min = 1;
+    for (int stone : stones) {
+        if (stone > max) max = stone;
+        if (stone < min) min = stone;
+    }
+
+    while (min <= max) {
+        int mid = (max + min) / 2;
+
+        int n;
+        for (n = 0; n < stones.size(); n++) {
+            // 탐색중인 돌을 mid명이 건널 수 있다면
+            if (stones[n] >= mid) continue;
+
+            // 건널 수 없다면
+            int jump;
+            for (jump = 1; jump < k; jump++) {
+                if (n + jump == stones.size() || stones[n + jump] >= mid) {
+                    n += (jump - 1); // 다음 반복문에 n++되니까
+                    break;
+                }
+            }
+            if (jump == k) { // 점프가 불가능한 거리라면
+                max = mid - 1;
+                break;
+            }
+        }
+        if (n == stones.size()) { // mid명이 징검다리를 건널 수 있다면
+            answer = mid; // 답안 갱신 
+
+            min = mid + 1;
+        }
+    }
+
+    return answer;
+}
