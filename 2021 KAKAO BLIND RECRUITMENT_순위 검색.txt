@@ -1,0 +1,85 @@
+// 2021 KAKAO BLIND RECRUITMENT : 순위 검색
+#include <string>
+#include <vector>
+#include <map>
+#include <sstream>
+#include <algorithm>
+
+using namespace std;
+
+vector<int> solution(vector<string> info, vector<string> query) {
+    vector<int> answer;
+
+    map<string, vector<int>> candidate; // info 배열을 피싱한 결과를 저장
+    
+    // info 배열 피싱
+    for (int i = 0; i < info.size(); i++) {
+        string tmp;
+        stringstream str(info[i]);
+        int condition = 0; // 몇번째 조건인지 확인할 때 사용
+        int score; // 지원자의 점수를 저장
+        
+        vector<vector<string>> result(4, vector<string>(2, "-")); // 하나의 info가 피싱된 결과를 저장
+
+        while (str >> tmp) {
+            if (condition < 4) {
+                result[condition++][0] = tmp;
+            }
+            else {
+                score = stoi(tmp); // string to int
+            }
+        }
+
+        // 피싱된 info 정보로 만들어 질 수 있는 모든 경우의 수("-"로 대체되는 경우를 포함)를 점수와 함께 저장
+        for (int i = 0; i < 2; i++) {
+            string c1, c2, c3, c4;
+            c1 = result[0][i];
+            for (int j = 0; j < 2; j++) {
+                c2 = result[1][j];
+                for (int k = 0; k < 2; k++) {
+                    c3 = result[2][k];
+                    for (int l = 0; l < 2; l++) {
+                        c4 = result[3][l];
+
+                        candidate[c1 + c2 + c3 + c4].push_back(score);
+                    }
+                }
+            }
+        }
+    }
+
+    // 각 조건에 해당하는 점수를 오름차순 정렬 
+    for (auto itr = candidate.begin(); itr != candidate.end(); itr++) {
+        sort(itr->second.begin(), itr->second.end());
+    }
+
+    // 조건을 만족하는 지원자의 수를 구한다.
+    for (int i = 0; i < query.size(); i++) {
+        string result = ""; // 피싱된 결과를 저장
+        string tmp; // 피싱된 중간값을 저장
+        stringstream str(query[i]);
+        int condition = 0; // 몇번째 조건인지를 저장
+        int score; // 점수 조건을 저장
+
+        while (str >> tmp) {
+            if (tmp == "and") continue;
+
+            if (condition < 4) {
+                result += tmp;
+                condition++;
+            }
+            else {
+                score = stoi(tmp); // string to int
+            }
+        }
+
+        // 4개의 조건과 점수조건을 만족하는 지원자의 수를 구한다.
+        auto itr = lower_bound(candidate[result].begin(), candidate[result].end(), score);
+        int num = candidate[result].size() - (itr - candidate[result].begin());
+
+        // 답안 갱신
+        answer.push_back(num);
+    }
+
+    return answer;
+}
