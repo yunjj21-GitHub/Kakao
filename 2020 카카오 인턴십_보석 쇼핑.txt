@@ -1,0 +1,46 @@
+// 2020 카카오 인턴십 : 보석 쇼핑
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <queue>
+
+using namespace std;
+
+vector<int> solution(vector<string> gems) {
+    vector<int> answer(2);
+    
+    // 보석 종류의 개수를 구한다.
+    unordered_map<string, int> dic;
+    int typeNum;
+    for (string gem : gems) {
+        dic[gem]++;
+    }
+    typeNum = dic.size();
+
+    // 시작 진열대 번호를 구한다.
+    queue<string> line; // 구매할 보석의 줄
+    unordered_map<string, int> gemNum; // line에 등장하는 각 보석의 개수를 저장
+    int start = 1; // 구매할 진열대 줄의 시작 번호
+    int lenght = gems.size() + 1; // 구매할 진열대 줄의 길이
+    for (string gem : gems) {
+        gemNum[gem]++;
+        line.push(gem);
+
+        // 시작 위치에 있는 보석이 뒤에 다시 등장한다면
+        while (gemNum[line.front()] > 1) {
+            gemNum[line.front()]--;
+            line.pop();
+
+            start++;
+        }
+
+        if (gemNum.size() == typeNum && lenght > line.size()) {
+            lenght = line.size();
+
+            answer[0] = start;
+            answer[1] = start + lenght - 1;
+        }
+    }
+
+    return answer;
+}
