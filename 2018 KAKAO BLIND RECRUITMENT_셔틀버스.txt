@@ -1,0 +1,76 @@
+// 2018 KAKAO BLIND RECRUITMENT : 셔틀버스
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+
+using namespace std;
+
+#define START 540 // 9*60 (첫번째 버스가 출발하는 시각)
+
+string solution(int n, int t, int m, vector<string> timetable) {
+    string answer = "";
+
+    // 도착 시간 문자열을 정수형으로 변환 (분 단위)
+    vector<int> timetable_int;
+    for (string time : timetable) {
+        int h = stoi(time.substr(0, 2));
+        int m = stoi(time.substr(3, 2));
+
+        timetable_int.push_back(h * 60 + m);
+    }
+
+    // 도착시간을 오름차순 정렬
+    sort(timetable_int.begin(), timetable_int.end());
+
+    vector<int> passengers(2000, 0); // 각 버스에 탄 승객의 수를 저장
+    int bus = 0; // 몇번째 버스인지를 저장
+    for (int time : timetable_int) {
+        // 도착시간에 따라 탈 수 있는 버스를 확인
+        if (time - START > 0 && ceill(((double)time - START) / t) > bus) {
+            bus = ceill(((double)time - START) / t); // 버스번호 갱신
+        }
+        else if (passengers[bus] == m) { // 승객이 더 탈수 있는 버스인지 확인
+            bus++; // 버스번호 갱신
+        }
+
+        // 해당 승객을 태운다.
+        passengers[bus]++;
+
+        // 해당 버스가 마지막 버스인데 사람이 더이상 탈 수 없다면
+        if (bus == n - 1 && passengers[bus] == m) {
+            int h = time / 60;
+            int m = time - ((time / 60) * 60);
+
+            // 현재 시각보다 콘은 1분 더 일찍 와야 한다.
+            if (m == 0) {
+                h--;
+                m = 59;
+            }
+            else {
+                m--;
+            }
+
+            // 답안 갱신
+            if (h < 10) answer += "0";
+            answer += (to_string(h) + ":");
+            if (m < 10) answer += "0";
+            answer += to_string(m);
+
+            return answer;
+        }
+    }
+
+    // n번째 버스에 남는 자리가 있다면
+    int conArrival = START + (n - 1) * t; // 마지막 버스가 출발하는 시각에 도착
+    int hour = conArrival / 60;
+    int minute = conArrival - ((conArrival / 60) * 60);
+
+    // 답안 갱신
+    if (hour < 10) answer += "0";
+    answer += (to_string(hour) + ":");
+    if (minute < 10) answer += "0";
+    answer += to_string(minute);
+
+    return answer;
+}
