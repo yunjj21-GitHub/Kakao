@@ -1,0 +1,107 @@
+// 2020 KAKAO BLIND RECRUITMENT : 기둥과 보 설치 (구현)
+#include <string>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+vector<bool> map[101][101]; // {기둥, 보}의 설치 여부를 저장 (0~n)
+int column = 0; // 기둥
+int beam = 1; // 보
+int N; // 설계도의 크기
+
+bool cmp(vector<int> a, vector<int> b) {
+    if (a[0] == b[0]) {
+        if (a[1] == b[1]) return a[2] < b[2];
+
+        return a[1] < b[1];
+    }
+
+    return a[0] < b[0];
+}
+
+// 해당 좌표의 기둥이 설치 조건을 만족하는지 확인하는 함수
+bool checkIfColumnCanBeInstalled(int y, int x) {
+    if (y != 0 &&
+        !(x - 1 >= 0 && map[y][x - 1][beam]) &&
+        !(map[y][x][beam]) &&
+        !(y - 1 >= 0 && map[y - 1][x][column])) {
+
+        return false;
+    }
+    return true;
+}
+
+// 해당 좌표의 보가 설치 조건을 만족하는지 확인하는 함수
+bool checkIBeamCanBeInstalled(int y, int x) {
+    if (!(y - 1 >= 0 && map[y - 1][x][column]) &&
+        !(y - 1 >= 0 && x + 1 <= N && map[y - 1][x + 1][column]) &&
+        !(x - 1 >= 0 && x + 1 <= N && map[y][x - 1][beam] && map[y][x + 1][beam])) {
+
+        return false;
+    }
+    return true;
+}
+
+vector<vector<int>> solution(int n, vector<vector<int>> build_frame) {
+    vector<vector<int>> answer;
+
+    N = n;
+
+    // 설계 도면 초기화
+    for (int i = 0; i <= n; i++) {
+        for (int j = 0; j <= n; j++) {
+            map[i][j].assign(2, false);
+        }
+    }
+
+    for (vector<int> job : build_frame) {
+        int x = job[0];
+        int y = job[1];
+        int structure = job[2];
+        int command = job[3];
+
+        // 삭제
+        if (command == 0) { // 삭제
+
+            // 해당 구조물을 삭제해도 다른 모든 구조물이 설치조건을 만족하는지 확인
+            map[y][x][structure] = false;
+            int i, j;
+            for (i = 0; i <= n; i++) {
+                for (j = 0; j <= n; j++) {
+
+                    // 세워진게 기둥이라면
+                    if (map[i][j][column] && !checkIfColumnCanBeInstalled(i, j)) break;
+
+                    // 세워진게 보라면
+                    if (map[i][j][beam] && !checkIBeamCanBeInstalled(i, j)) break;
+                }
+                if (j != n + 1) break;
+            }
+            if (i != n + 1) map[y][x][structure] = true;
+
+            continue;
+        }
+
+        // 설치
+        if (structure == column) { // 기둥
+            if (checkIfColumnCanBeInstalled(y, x)) map[y][x][column] = true;
+        }
+        else { // 보
+            if (checkIBeamCanBeInstalled(y, x)) map[y][x][beam] = true;;
+        }
+    }
+
+    // 구조물의 상태를 받아옴
+    for (int i = 0; i <= n; i++) {
+        for (int j = 0; j <= n; j++) {
+            if (map[i][j][0]) answer.push_back({ j, i, 0 });
+            if (map[i][j][1]) answer.push_back({ j, i, 1 });
+        }
+    }
+
+    // 조건에 따라 정렬
+    sort(answer.begin(), answer.end(), cmp);
+
+    return answer;
+}
