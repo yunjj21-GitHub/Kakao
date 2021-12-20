@@ -1,0 +1,68 @@
+// 2021 카카오 채용연계형 인턴십 : 표 편집
+#include <string>
+#include <vector>
+#include <map>
+#include <stack>
+
+#include <iostream>
+
+using namespace std;
+
+string solution(int n, int k, vector<string> cmd) {
+    string answer = "";
+
+    // 표 초기화
+    map<int, int> table; // 표 정보를 저장 (행 번호 : 0~n-1)
+    for (int i = 0; i < n; i++) {
+        table[i];
+    }
+
+    // 선택된 행 초기화
+    auto itr = table.begin(); // 선택된 행을 가리킴
+    for (int i = 0; i < k; i++) {
+        itr++;
+    }
+
+    // 명령어 처리
+    stack<int> deleted; // 최근 삭제된 항목을 저장
+    for (int i = 0; i < cmd.size(); i++) {
+        switch (cmd[i][0])
+        {
+        case 'U': {
+            int x = stoi(cmd[i].substr(2));
+            for (int j = 0; j < x; j++) {
+                itr--;
+            }
+            break;
+        }
+        case 'D': {
+            int x = stoi(cmd[i].substr(2));
+            for (int j = 0; j < x; j++) {
+                itr++;
+            }
+            break;
+        }
+        case 'C': {
+            deleted.push(itr->first);
+            table.erase(itr++);
+
+            if (itr == table.end()) itr--;
+
+            break;
+        }
+        case 'Z': {
+            table[deleted.top()];
+            deleted.pop();
+            break;
+        }
+        }
+    }
+
+    // 답안 갱신
+    for (int i = 0; i < n; i++) {
+        if (table.find(i) == table.end()) answer += "X";
+        else answer += "O";
+    }
+    
+    return answer;
+}
