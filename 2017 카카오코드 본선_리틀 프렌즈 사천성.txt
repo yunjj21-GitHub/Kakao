@@ -1,0 +1,94 @@
+// 2017 카카오코드 본선 : 리틀 프렌즈 사천성
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+
+// 가능한 직선의 이동 경로를 저장
+int dy[4] = { 0, 0, 1, -1 };
+int dx[4] = { 1, -1, 0, 0 };
+
+using namespace std;
+
+// 전역 변수를 정의할 경우 함수 내에 초기화 코드를 꼭 작성해주세요.
+string solution(int m, int n, vector<string> board) {
+    string answer = "";
+
+    map<char, vector<pair<int, int>>> tile; // {alpabet, {y, x}}
+
+    // 보드에 등장하는 타일의 시작점과 끝점을 map에 넣음
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            // 확인하고 있는 좌표가 알파벳이라면
+            if (board[i][j] != '*' && board[i][j] != '.') {
+                tile[board[i][j]].push_back({ i, j });
+            }
+        }
+    }
+
+    // 시작점으로 부터 끝점까지 코너를 1개 이하로 만들면서 탐색이 가능한지 확인
+    auto itr = tile.begin();
+    while (itr != tile.end()) {
+        char target = itr->first;
+
+        int startY = itr->second[0].first;
+        int startX = itr->second[0].second;
+
+        int endY = itr->second[1].first;
+        int endX = itr->second[1].second;
+
+        // BFS 알고리즘 사용
+        queue<vector<int>> q; // {y, x, dir, cornerNum};
+        bool chk[100][100][4][2] = {}; // 방문여부 저장하는 벡터
+        q.push({ startY, startX, -1, 0 });
+
+        while (!q.empty()) {
+            int y = q.front()[0];
+            int x = q.front()[1];
+            int dir = q.front()[2];
+            int cornerNum = q.front()[3];
+            q.pop();
+
+            // 타일이 사라질 수 있다면
+            if (y == endY && x == endX) {
+                // 보드에 들어있는 타일의 종류 갱신
+                tile.erase(target);
+                // 보드 갱신
+                board[startY][startX] = '.';
+                board[endY][endX] = '.';
+                answer += target; // 답안 갱신
+                itr = tile.begin(); // 다시 처음부터 검사
+                break;
+            }
+
+            for (int i = 0; i < 4; i++) {
+                int nxtY = y + dy[i];
+                int nxtX = x + dx[i];
+                int nxtCornerNum = cornerNum;
+
+                // 보드 밖의 영역이라면
+                if (0 > nxtY || nxtY >= m || 0 > nxtX || nxtX >= n) continue;
+
+                // 갈수 없는 경로라면
+                if (board[nxtY][nxtX] == '*' || 
+                   (board[nxtY][nxtX] != '.' && board[nxtY][nxtX] != target)) continue;
+
+                // 시작점으로 부터 2번이상 꺾여야 한다면
+                if (dir != -1 && dir != i && ++nxtCornerNum >= 2) continue;
+
+                // 이미 방문했던 좌표라면
+                if (chk[nxtY][nxtX][i][nxtCornerNum]) continue;
+
+                q.push({ nxtY, nxtX, i, nxtCornerNum });
+                chk[nxtY][nxtX][i][nxtCornerNum] = true;
+            }
+        }
+
+        if (tile.find(target) != tile.end()) itr++;
+    }
+
+    // 모든 타일이 사라질 수 없다면
+    if (itr == tile.end() && tile.size() != 0) answer = "IMPOSSIBLE";
+
+    return answer;
+}
