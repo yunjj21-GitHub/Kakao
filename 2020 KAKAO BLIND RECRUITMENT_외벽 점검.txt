@@ -1,0 +1,52 @@
+// 2020 KAKAO BLIND RECRUITMENT : 외벽 점검
+#include <string>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+int INF = 1e9; // 임의의 큰 값
+
+int solution(int n, vector<int> weak, vector<int> dist) {
+    int answer = INF;
+
+    // 취약지점이 동그란 외벽을 표현하도록 변형 
+    int weakNum = weak.size();
+    weak.resize(weakNum * 2);
+    for (int i = weakNum; i < weakNum * 2; i++) {
+        weak[i] = weak[i - weakNum] + n;
+    }
+
+    // 친구들이 순차적으로 나갈 수 있는 모든 경우의 수를 구한다.
+    sort(dist.begin(), dist.end());
+
+    do {
+        // 모든 취약지점을 출발점으로 탐색
+        for (int i = 0; i < weakNum; i++) {
+            int start = weak[i];
+            int finish = weak[i + weakNum - 1]; // weakNum개를 검사
+           
+            // 친구들이 순차적으로 나감
+            for(int j=0; j<dist.size(); j++){
+                start += dist[j];
+
+                // 모든 취약지점을 탐색했다면
+                if (start >= finish) {
+                    answer = min(answer, j + 1); // j는 인덱스
+                    break;
+                }
+
+                // 현재 나간 친구가 걸을만큼 걸었다면 다음 친구를 다음 취약지점에 투입
+                int nxt = upper_bound(weak.begin(), weak.end(), start) - weak.begin(); // 인덱스를 넘겨줌
+                start = weak[nxt];
+            }
+        }
+
+
+    } while (next_permutation(dist.begin(), dist.end()));
+
+    // 모든 외벽을 검사할 수 없다면
+    if (answer == INF) answer = -1;
+
+    return answer;
+}
